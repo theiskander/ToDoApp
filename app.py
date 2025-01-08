@@ -15,10 +15,17 @@ db.init_app(app)
 
 @app.route('/')
 def index():
+    check = check_access(True)
+    if check:
+        return check
     return "It works!"
 
 @app.route('/register', methods=['GET','POST'])
 def register():
+    check = check_access(False)
+    if check:
+        return check
+
     form = RegistrationForm()
     if form.validate_on_submit():
         user = User(name=form.username.data)
@@ -31,6 +38,10 @@ def register():
 
 @app.route('/login', methods=['GET','POST'])
 def login():
+    check = check_access(False)
+    if check:
+        return check
+
     form = LoginForm()
     if form.validate_on_submit():
         # User search
@@ -46,9 +57,22 @@ def login():
 
 @app.route('/logout')
 def logout():
+    check = check_access(True)
+    if check:
+        return check
+
     session.pop('user_id', None)
     flash('You have successfully logged out', 'success')
     return redirect(url_for('login'))
+
+def check_access(expected):
+    if expected and 'user_id' not in session:
+        flash('Please log in', 'warning')
+        return redirect(url_for('login'))
+    elif not expected and 'user_id' in session:
+        flash('You have already logged in', 'warning')
+        return redirect(url_for('index'))
+    return None
 
 if __name__ == "__main__":
     app.run(debug=True)
