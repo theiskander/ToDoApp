@@ -1,8 +1,9 @@
-from flask import Flask, render_template, redirect, url_for, flash
+from flask import Flask, render_template, redirect, url_for, flash, session
 from extensions import db
 
 from models import User
-from forms import RegistrationForm
+from forms import RegistrationForm, LoginForm
+from werkzeug.security import check_password_hash
 
 app = Flask(__name__)
 
@@ -27,6 +28,21 @@ def register():
         flash('You have registered!', 'success')
         return redirect(url_for('index'))
     return render_template('register.html', form=form)
+
+@app.route('/login', methods=['GET','POST'])
+def login():
+    form = LoginForm()
+    if form.validate_on_submit():
+        # User search
+        user = User.query.filter_by(name=form.username.data).first()
+        if user and check_password_hash(user.hash_pass, form.password.data):
+            # Create a session
+            session['user_id'] = user.id
+            flash('You have successfully logged in', 'success')
+            return redirect(url_for('index'))
+        else:
+            flash('Invalid username or password', 'danger')
+    return render_template('login.html', form=form)
 
 if __name__ == "__main__":
     app.run(debug=True)
