@@ -44,5 +44,11 @@ def login():
             flash('Invalid username or password', 'danger')
     return render_template('login.html', form=form)
 
+@app.route('/logout')
+def logout():
+    session.pop('user_id', None)
+    flash('You have successfully logged out', 'success')
+    return redirect(url_for('login'))
+
 if __name__ == "__main__":
     app.run(debug=True)
