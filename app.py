@@ -20,7 +20,9 @@ def index():
     check = check_access(True)
     if check:
         return check
-    return "It works!"
+    
+    tasks = Task.query.filter_by(user_id=session['user_id']).all()
+    return render_template('index.html', tasks=tasks)
 
 @app.route('/register', methods=['GET','POST'])
 def register():

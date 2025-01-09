@@ -1,0 +1,9 @@
+<ul>
+    {% for task in tasks %}
+        <li>
+            <strong>{{ task.title }}</strong>
+            <p>{{ task.description }}</p>
+            <p>Due: {{ task.due_date.strftime('%Y-%m-%d') if task.due_date else 'No deadline' }}</p>
+        </li>
+    {% endfor %}
+</ul>
