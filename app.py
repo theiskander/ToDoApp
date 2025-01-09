@@ -81,7 +81,7 @@ def create_task():
         due_date = request.form.get('due_date')
       
         #Converting date from the form
-        due_date = datetime.strtime(due_date, '%Y-%m-%d') if due_date else None
+        due_date = datetime.strptime(due_date, '%Y-%m-%d') if due_date else None
 
         new_task = Task(
             title = title,
@@ -93,7 +93,7 @@ def create_task():
         db.session.add(new_task)
         db.session.commit()
         flash('Task created', 'success')
-        return redirect(url_for('/'))
+        return redirect(url_for('index'))
     return render_template('create_task.html')
     
 def check_access(expected):
