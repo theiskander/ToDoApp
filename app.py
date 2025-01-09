@@ -1,9 +1,11 @@
-from flask import Flask, render_template, redirect, url_for, flash, session
+from flask import Flask, render_template, redirect, url_for, flash, session, request
 from extensions import db
 
-from models import User
+from models import User, Task
 from forms import RegistrationForm, LoginForm
 from werkzeug.security import check_password_hash
+
+from datetime import datetime
 
 app = Flask(__name__)
 
@@ -65,6 +67,33 @@ def logout():
     flash('You have successfully logged out', 'success')
     return redirect(url_for('login'))
 
+@app.route('/tasks/create', methods=['GET', 'POST'])
+def create_task():
+    check = check_access(True)
+    if check:
+        return check
+    
+    if request.method == 'POST':
+        title = request.form.get('title')
+        description = request.form.get('description')
+        due_date = request.form.get('due_date')
+      
+        #Converting date from the form
+        due_date = datetime.strtime(due_date, '%Y-%m-%d') if due_date else None
+
+        new_task = Task(
+            title = title,
+            description=description,
+            due_date=due_date,
+            user_id=session['user_id']
+        )
+    
+        db.session.add(new_task)
+        db.session.commit()
+        flash('Task created', 'success')
+        return redirect(url_for('/'))
+    return render_template('create_task.html')
+    
 def check_access(expected):
     if expected and 'user_id' not in session:
         flash('Please log in', 'warning')
