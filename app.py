@@ -118,6 +118,42 @@ def delete_task(id):
         return redirect(url_for('index'))
     return render_template('delete_task.html', task=task)
 
+@app.route('/tasks/edit/<int:id>', methods=['GET', 'POST'])
+def edit_task(id):
+    check = check_access(True)
+    if check:
+        return check
+    
+    #Checking id existence
+    task = Task.query.get(id)
+    if not task:
+        flash('Task not found', 'danger')
+        return redirect(url_for('index'))
+    
+    if request.method == 'POST':
+        title = request.form.get('title')
+        if not title:
+            title = task.title
+            
+        description = request.form.get('description')
+        if not description:
+            description = task.description
+            
+        due_date = request.form.get('due_date')
+        if due_date:
+            due_date = datetime.strptime(due_date, '%Y-%m-%d')
+        else:
+            due_date = task.due_date
+        
+        #Updating
+        task.title = title
+        task.description = description
+        task.due_date = due_date
+        db.session.commit()
+        flash('Task updated', 'success')
+        return redirect(url_for('index'))
+    return render_template('edit_task.html', task=task)
+
 # Access checker
 def check_access(expected):
     if expected and 'user_id' not in session:
