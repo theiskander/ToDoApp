@@ -116,7 +116,7 @@ def delete_task(id):
         db.session.commit()
         flash('Task deleted', 'success')
         return redirect(url_for('index'))
-    return render_template('delete_task.html')
+    return render_template('delete_task.html', task=task)
 
 # Access checker
 def check_access(expected):
