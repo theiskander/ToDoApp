@@ -15,6 +15,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db.init_app(app)
 
+# Main route
 @app.route('/')
 def index():
     check = check_access(True)
@@ -24,6 +25,7 @@ def index():
     tasks = Task.query.filter_by(user_id=session['user_id']).all()
     return render_template('index.html', tasks=tasks)
 
+# Users routes
 @app.route('/register', methods=['GET','POST'])
 def register():
     check = check_access(False)
@@ -69,6 +71,7 @@ def logout():
     flash('You have successfully logged out', 'success')
     return redirect(url_for('login'))
 
+# Tasks routes
 @app.route('/tasks/create', methods=['GET', 'POST'])
 def create_task():
     check = check_access(True)
@@ -95,7 +98,27 @@ def create_task():
         flash('Task created', 'success')
         return redirect(url_for('index'))
     return render_template('create_task.html')
+
+@app.route('/tasks/delete/<int:id>', methods=['GET', 'POST'])
+def delete_task(id):
+    check = check_access(True)
+    if check:
+        return check
     
+    #Checking id existence
+    task = Task.query.get(id)
+    if not task:
+        flash('Task not found', 'danger')
+        return redirect(url_for('index'))
+    
+    if request.method == 'POST':
+        db.session.delete(task)
+        db.session.commit()
+        flash('Task deleted', 'success')
+        return redirect(url_for('index'))
+    return render_template('delete_task.html')
+
+# Access checker
 def check_access(expected):
     if expected and 'user_id' not in session:
         flash('Please log in', 'warning')
