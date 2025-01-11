@@ -1,10 +1,20 @@
-<h2>Tasks</h2>
-<ul>
-    {% for task in tasks %}
-        <li>
-            <strong>{{ task.title }}</strong>
-            <p>{{ task.description }}</p>
-            <p>Due: {{ task.due_date.strftime('%Y-%m-%d') if task.due_date else 'No deadline' }}</p>
-        </li>
-    {% endfor %}
-</ul>
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Tasks</title>
+    </head>
+    <body>
+        <h2>Tasks</h2>
+        <ul>
+            {% for task in tasks %}
+                <li>
+                    <strong>{{ task.title }}</strong>
+                    <p>{{ task.description }}</p>
+                    <p>Due: {{ task.due_date.strftime('%Y-%m-%d') if task.due_date else 'No deadline' }}</p>
+                </li>
+            {% endfor %}
+        </ul>
+    </body>
+</html>
