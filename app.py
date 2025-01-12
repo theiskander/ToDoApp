@@ -111,6 +111,9 @@ def delete_task(id):
         flash('Task not found', 'danger')
         return redirect(url_for('index'))
     
+     #Checking owner of the task
+    check_user(task)
+    
     if request.method == 'POST':
         db.session.delete(task)
         db.session.commit()
@@ -129,6 +132,11 @@ def edit_task(id):
     if not task:
         flash('Task not found', 'danger')
         return redirect(url_for('index'))
+    
+    #Checking owner of the task
+    check = check_user(task)
+    if check:
+        return check
     
     if request.method == 'POST':
         title = request.form.get('title')
@@ -161,6 +169,12 @@ def check_access(expected):
         return redirect(url_for('login'))
     elif not expected and 'user_id' in session:
         flash('You have already logged in', 'warning')
+        return redirect(url_for('index'))
+    return None
+
+def check_user(task):
+    if task.user_id != session['user_id']:
+        flash('Access denied: You can only edit your own tasks', 'danger')
         return redirect(url_for('index'))
     return None
 
